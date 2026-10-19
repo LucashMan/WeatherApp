@@ -1,9 +1,9 @@
 require("dotenv/config")
 
-const { fetchForecast } = require("./weatherApi");
-const { getDailyForecast } = require("./writeForecast");
-const { saveCsv } = require("./writeCsv");
-
+const { fetchForecast } = require("./src/weatherApi");
+const { getDailyForecast } = require("./src/writeForecast");
+const { saveCsv } = require("./src/writeCsv");
+const { log } = require("./src/logger");
 
 async function main() {
     const args = process.argv.slice(2);
@@ -23,12 +23,13 @@ async function main() {
     const rows = getDailyForecast(data);
     const fileName = saveCsv(data.location.name, rows);
 
-    console.log(`La météo pour ${data.location.name} a été écrite dans le fichier ${fileName}`);
+
+    log.info(`La météo pour ${data.location.name} a été écrite dans le fichier ${fileName}`);
 }
 
-//Attraper les erreurs éventuelles
+//Attraper les erreurs éventuelles et systématiquement les logger avant de quitter le programme
 main().catch((err) => {
-    if (err.message) console.error(`Erreur : ${err.message}`);
-    if (err.cause) console.error(`Cause : ${err.cause}`);
+    if (err.message) log.error(`Erreur : ${err.message}`);
+    if (err.cause) log.error(`Cause : ${err.cause}`);
     process.exit(1);
 });
